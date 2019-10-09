@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 use Response;
 use DB;
 class investorController extends Controller
@@ -60,89 +61,57 @@ class investorController extends Controller
             $return['data'] =[];
             return $return;
         }
-        try {
-            Excel::load(Input::file('file'), function ($reader){
-                $reader->each(function($sheet, $i =0) { 
-                    if ($i == 0) {
-                        $masterFile = new MF;
-                        $masterFile->file_name = Input::file('file')->getClientOriginalName();
-                        $masterFile->created_at = date('Y-m-d H:i:s');
-                        $masterFile->date = date('Y-m-d',strtotime(Input::get('tanggal')));
-                        $masterFile->save();
-                        $id_master = $masterFile->id;
-                    }
-                 $detailFile = new DF;
-                 $detailFile->no = $sheet['no'];
-                 $detailFile->tanggal = $sheet['tanggal'];
-                 $detailFile->nama_investor = $sheet['nama_investor'];
-                 $detailFile->nomor_rekening = $sheet['nomor_rekening'];
-                 $detailFile->id_master = $id_master;
-                 $detailFile->created_at = date('Y-m-d H:i:s');
-                 $detailFile->tanggal = date('Y-m-d',strtotime($sheet['tanggal']));
-                 $detailFile->save();
-                $i++;
-                DB::commit();
-                });
-           });
-        }catch (\Exception $e) {
-            DB::rollback();
-            print_r($e);die;
-            $validator = 'gagal transaksi data !!!';
-            $return['status'] = false;
-            $return['messages'] =$validator;
-            $return['data'] =[];
-            return $return;
+        $tampung = array();
+        $data =Excel::load(Input::file('file'))->get();  
+        if ($data->count() > 0){
+            try {
+                $masterFile = new MF;
+                $masterFile->file_name = Input::file('file')->getClientOriginalName();
+                $masterFile->created_at = date('Y-m-d H:i:s');
+                $masterFile->date = date('Y-m-d',strtotime(Input::get('tanggal')));
+                $masterFile->save();
+                $id_master = $masterFile->id;
+                foreach($data->toArray() as $key => $sheet) {
+                    $detailFile = new DF;
+                    $detailFile->no = $sheet['no'];
+                    $detailFile->passport = $sheet['passport'];
+                    $detailFile->tanggal = $sheet['tanggal'];
+                    $detailFile->nama_investor = $sheet['nama_investor'];
+                    $detailFile->nomor_rekening = $sheet['nomor_rekening'];
+                    $detailFile->id_master = $id_master;
+                    $detailFile->created_at = date('Y-m-d H:i:s');
+                    $detailFile->tanggal = date('Y-m-d',strtotime($sheet['tanggal']));
+                    $detailFile->nomor_ktp = $sheet['nomor_ktp'];
+                    $detailFile->npwp = $sheet['npwp'];
+                    $detailFile->alamat_1 = $sheet['alamat_1'];
+                    $detailFile->alamat_2 = $sheet['alamat_2'];
+                    $detailFile->la = $sheet['la'];
+                    $detailFile->status_investor = $sheet['status_investor'];
+                    $detailFile->kewarganegaraan = $sheet['kewarganegaraan'];
+                    $detailFile->tingkat_pajak_corp = $sheet['tingkat_pajak_corp'];
+                    $detailFile->tingkat_pajak_mtn = $sheet['tingkat_pajak_mtn'];
+                    $detailFile->kode_pemegang_rekening = $sheet['kode_pemegang_rekening'];
+                    $detailFile->jumlah = floatval($sheet['jumlah']);
+                    $detailFile->status_rekening = $sheet['status_rekening'];
+                    $detailFile->status_balance = $sheet['status_balance'];
+                    $detailFile->percentage =floatval($sheet['percentage']);
+                    $detailFile->nomor_sid = $sheet['nomor_sid'];
+                    $detailFile->tingkat_pajak_equi = $sheet['tingkat_pajak_equi'];
+                    $detailFile->save();
+                }
+                    DB::commit();
+                    $validator = 'transaksi anda berhasil';
+                    $return['status'] = true;
+                    $return['messages'] =$validator;
+                    $return['data'] =[];
+                    return $return;
+             }catch (\Exception $e) {
+                DB::rollBack();
+                $json['status'] = false;
+                $json['messages'] = 'Failed';
+                $json['data'] = [];
+             }
         }
-       
-       die;
-        echo "<pre>";
-        print_r($data);die;
-        $checkPassword = US::where('password', md5($data['password']))->get()->toArray();
-        if (empty($checkPassword)) {
-            $picture =$this->uploadfile('picture');
-            $users =new US;
-            $users->name =$data['name'];
-            $users->password =md5($data['password']);
-            $users->email =$data['email'];
-            $users->created_at =date('Y-m-d H:i:s');
-            $users->updated_at=date('Y-m-d H:i:s');
-            $users->phone_number= $data['phone_number'];
-            $users->save();
-           
-            $return['status'] = true;
-            $return['messages'] ='Berhasil';
-            $return['data'] =[];
-            return $return;
-
-        }
-            $validator = 'password yang anda gunakan telah tersedia. gunakan password lain!';
-            $return['status'] = false;
-            $return['messages'] =$validator;
-            $return['data'] =[];
-            return $return;
-    }
-   
-    
-    public function update($data) {
-           
-           //get data id_category where brand and category 
-           $user =US::find($data['id']);
-           $user->name =$data['name'];
-           if ($data['password'] == $data['old_password']) {
-            $user->password =$data['password'];
-           }else{
-            $user->password =md5($data['password']);
-           }
-           $user->email =$data['email'];
-           $user->updated_at=date('Y-m-d H:i:s');
-           $user->phone_number= $data['phone_number'];
-           $user->update();
-           //return
-           $return['status'] = true;
-           $return['messages'] ='Berhasil';
-           $return['data'] =[];
-           
-           return $return;
     }
     private function uploadfile($fn)
     {
@@ -155,36 +124,89 @@ class investorController extends Controller
             return $fileName;
         }
     }
-    public function edit() {
-        //get id karyawan
-        $id =Input::get('id');
-        //get karyawan by id
-        $edit = US::getByID($id);
-        $data = json_decode(json_encode($edit), true);
-        if ($edit) {
-            $data[0]['submit'] = "Update";
-            $json['status'] = true;
-            $json['messages'] = 'Success';
-            $json['data'] = $data[0];
-        }else{
-            $json['status'] = false;
-            $json['messages'] = 'Failed';
-            $json['data'] = [];
+    public function indexAjax(){
+        $draw=$_REQUEST['draw'];
+        $length=$_REQUEST['length'];
+        $start=$_REQUEST['start'];
+        $search=$_REQUEST['search']["value"];
+        $queryCount =DF::getCount(false);
+        
+        // ======= count ===== //
+        // $total =count($queryCount);
+        // print_r();die;
+        // ======= count ===== //
+        $output=array();
+        $output['draw']=$draw;
+        $output['recordsTotal']=$output['recordsFiltered']=$queryCount[0]->count;
+        $output['data']=array();
+        $list = [];
+        $query =DF::getAll(true);
+        foreach ($query as $key => $row) {
+            // $start = date('d-m-Y H:i:s',strtotime($row->start_tgl_rapat));
+            // $end = date('d-m-Y H:i:s',strtotime($row->end_tgl_rapat));
+            $json['no'] = $row->no;
+            $json['id'] = $row->id;
+            $json['nama_investor'] = $row->nama_investor;
+            $json['nomor_ktp'] = $row->nomor_ktp;
+            $json['npwp'] = $row->npwp;
+            $json['kewarganegaraan'] = $row->kewarganegaraan;
+            $list[] = $json;
         }
-         //send view with data
-         return Response::json($json);
+        $output['data']  = $list;
+        echo json_encode($output);
+    }  
+    public function compareindexAjax(){
+        $draw=$_REQUEST['draw'];
+        $length=$_REQUEST['length'];
+        $start=$_REQUEST['start'];
+        $search=$_REQUEST['search']["value"];
+        $queryCount =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
+        
+        // ======= count ===== //
+        $total =count($queryCount);
+        // print_r();die;
+        // ======= count ===== //
+        $output=array();
+        $output['draw']=$draw;
+         $output['recordsTotal']=$output['recordsFiltered']=$total;
+        $output['data']=array();
+        $list = [];
+        $query =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),true);
+        foreach ($query as $key => $row) {
+            $json['no'] = $row->no;
+            $json['id'] = $row->id;
+            $json['nama_investor'] = $row->nama_investor;
+            $json['nomor_ktp'] = $row->nomor_ktp;
+            $json['npwp'] = $row->npwp;
+            $json['kewarganegaraan'] = $row->kewarganegaraan;
+            $list[] = $json;
+        }
+        $output['data']  = $list;
+        echo json_encode($output);
+    }    
+    public function compareIndex(){
+        return view('admin/investor/investorCompare');
     }
-    public function delete($id)
-    {
-        try {
-            $user = US::find($id);
-            $user->delete();
-        } catch (\Exception $e) {
-            \Session::flash('DeleteFails', 'this data is used in other tables');
-            return \Redirect::to(route('user.index'));
-        }
-
-        \Session::flash('DeleteSucces', 'SUCCESS');
-        return \Redirect::to(route('user.index'));
+    public function generateExcel()
+    {   
+        $data =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
+        $data2 =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal2'))),date("Y-m-d",strtotime(Input::get('tanggal'))),false);
+        $data =json_decode(json_encode($data), true);
+        $data2 =json_decode(json_encode($data2), true);
+        return Excel::create('testing', function($excel) use ($data,$data2) {
+            $excel->sheet('Sheet1', function($sheet) use ($data)
+            {
+                $sheet->fromArray($data);
+            });
+            $excel->sheet('Sheet2', function($sheet) use ($data2)
+            {
+                $sheet->fromArray($data2);
+            });
+        })->export('xls');
+    }
+    public function countByDateForGraph() {
+        $data = DF::getCountByMonth();
+        $output['data'] = $data;
+        echo json_encode($output);
     }
 }

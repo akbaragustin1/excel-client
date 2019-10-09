@@ -28,5 +28,6 @@
 
     <!-- Custom Theme Style -->
     <link href="{{ URL::asset('') }}plugins/build/css/custom.min.css" rel="stylesheet">
+
     @yield('header')
   </head>

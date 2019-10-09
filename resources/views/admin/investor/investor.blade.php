@@ -80,6 +80,47 @@
         </div>
       </div>
         <br />
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Default Example <small>Investor</small></h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Settings 1</a>
+                    </li>
+                    <li><a href="#">Settings 2</a>
+                    </li>
+                  </ul>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <table id="datatable" class="table table-striped table-bordered listTable">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Nama Investor</th>
+                    <th>Nomor KTP</th>
+                    <th>NPWP</th>
+                    <th>Kewarganegaraan</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
   </div>
   <!-- /page content -->    
 
@@ -93,10 +134,39 @@
     <!-- Ion.RangeSlider -->
     <script src="{{ URL::asset('') }}plugins/vendors/ion.rangeSlider/js/ion.rangeSlider.min.js"></script>
     <!-- Bootstrap Colorpicker -->
-
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
-var urlSaveInvestor ="{{url(route('investor.create'))}}";
+  var urlAjaxShow = "{{url('/admin/investor-index')}}";
+  var urlSaveInvestor ="{{url(route('investor.create'))}}";
+  var listTable = $('.listTable').DataTable( {
+        "processing": false,
+        "bFilter": true,
+        "bInfo": false,
+        "bLengthChange": false,
+        "serverSide": true,
+        "ajax": {
+             "url": urlAjaxShow,
+             "type": "GET"
+         },
+         "columns": [
+            { "data": "no" },
+            { "data": "nama_investor" },
+            { "data": "nomor_ktp" },
+            { "data": "npwp" },
+            { "data": "kewarganegaraan" },
+            { "render": function (data, type, row, meta) {
+                        var show = $('<a><button>')
+                                    .attr('class', "btn bg-blue-grey waves-effect edit-menu")
+                                    .attr('onclick', "showProcess('"+row.id+"')")
+                                    .text('Show')
+                                    .wrap('<div></div>')
+                                    .parent()
+                                  .html();
+                        return show ;
+           					 }
+            },
+        ]
+  });
 //this date picker
 $('#tanggal').datetimepicker();
  //this is validation jquery
@@ -180,7 +250,6 @@ function ValidateSingleInput(oInput) {
     }
     return true;
 }
-    
 </script>
 @endsection
 @stop
