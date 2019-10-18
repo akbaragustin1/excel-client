@@ -82,7 +82,7 @@ class DetailsFile extends Model {
             $where .= " AND details_file.nama_investor  like '%".$value."%'";
         }  
         $query = "					
-                SELECT * FROM master_file
+                SELECT details_file.* FROM master_file
                 Left JOIN details_file on details_file.id_master = master_file.id
                 WHERE master_file.date = '".$firstDate."' AND details_file.no NOT IN (SELECT details_file.no FROM master_file
                 Left JOIN details_file on details_file.id_master = master_file.id
@@ -101,7 +101,37 @@ class DetailsFile extends Model {
           $result[] = $listData[0]->total;
         }
      return $result;
-
     }
+    public static function getIDsExisting($firstDate,$endDate,$ids){
+        $search = Input::get('search');
+        $where = "";
+        if (!empty($search['value'])){
+            $value = $search['value'];
+            $where .= " WHERE data2.nama_investor  like '%".$value."%'";
+        }  
+        $whereIn = "";
+        if (count($ids) > 0) {
+            $whereIn .= "WHERE d2.no NOT IN (".implode(',',$ids).")";
+        }
+        $query = "SELECT d1.jumlah as jumlah_lawan,data2.jumlah, data2.id,
+        CASE
+            WHEN d1.jumlah > data2.jumlah THEN 'h'
+            ELSE 'k'
+        END AS status_jumlah,
+        (d1.jumlah - data2.jumlah) as hasil_kurang,
+        data2.no,
+        data2.nama_investor,
+        data2.nomor_rekening,
+        data2.nomor_sid
+    FROM master_file m1
+        LEFT JOIN details_file d1 ON d1.id_master = m1.id and m1.date = '".$endDate."'
+        INNER JOIN  (SELECT d2.*,m2.date as datem2,m2.id as idm2 FROM master_file m2
+Left JOIN details_file d2 on d2.id_master = m2.id and m2.date = '".$firstDate."' ".$whereIn.") data2 ON data2.no = d1.no AND data2.jumlah != d1.jumlah
+    ".$where."
+";
+    $listData = \DB::select($query);
+    return $listData;
+    }
+
 
 }

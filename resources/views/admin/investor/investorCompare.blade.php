@@ -97,10 +97,11 @@
                         <tr>
                         <th>No</th>
                         <th>Nama Investor</th>
-                        <th>Nomor KTP</th>
-                        <th>NPWP</th>
-                        <th>Kewarganegaraan</th>
-                        <th>Action</th>
+                        <th>Nomor SID</th>
+                        <th>No Rek</th>
+                        <th>Jumlah</th>
+                        <th>Perubahan Jumlah</th>
+                        <!-- <th>Action</th> -->
                         </tr>
                     </thead>
                     </table>
@@ -111,6 +112,7 @@
             <div class="col-md-6 col-sm-6 col-xs-12">
                 <div class="x_panel">
                 <div class="x_title">
+                <h2 class="basic1"></h2>
                     <ul class="nav navbar-right panel_toolbox">
                     <li><a class="generateExcel"><i class="fa fa-file-excel-o" aria-hidden="true"></i></a></li>
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
@@ -126,10 +128,11 @@
                         <tr>
                         <th>No</th>
                         <th>Nama Investor</th>
-                        <th>Nomor KTP</th>
-                        <th>NPWP</th>
-                        <th>Kewarganegaraan</th>
-                        <th>Action</th>
+                        <th>nomor_sid</th>
+                        <th>No Rek</th>
+                        <th>Jumlah</th>
+                        <th>Perubahan Jumlah</th>
+                        <!-- <th>Action</th> -->
                         </tr>
                     </thead>
                     </table>
@@ -172,72 +175,108 @@
     $('.submit').on('click',function () {
        var tanggal = $(".tanggal").val();
        var tanggal2 = $(".tanggal2").val();
-        if ((tanggal != "") & (tanggal2 != "") & (tanggal != tanggal2)) {
-            $('.basic').html('<h2>'+tanggal+'</h2>');
-            $('.basic1').html('<h2>'+tanggal2+'</h2>');
-            var listTable1 = $('.listTable1').DataTable( {
-                    "processing": false,
-                    "bFilter": true,
-                    "bInfo": false,
-                    "bLengthChange": false,
-                    "serverSide": true,
-                    "ajax": {
-                        "url": urlGetshow1+"?tanggal="+tanggal+"&tanggal2="+tanggal2,
-                        "type": "GET"
-                    },
-                    "columns": [
-                        { "data": "no" },
-                        { "data": "nama_investor" },
-                        { "data": "nomor_ktp" },
-                        { "data": "npwp" },
-                        { "data": "kewarganegaraan" },
-                        { "render": function (data, type, row, meta) {
-                            var show = $('<a><button>')
-                                        .attr('class', "btn bg-blue-grey waves-effect edit-menu")
-                                        .attr('onclick', "showProcess('"+row.id+"')")
-                                        .text('Show')
-                                        .wrap('<div></div>')
-                                        .parent()
-                                    .html();
-                            return show ;
-                                }
-                        },
-                    ],
-            });
-            var listTable2 = $('.listTable2').DataTable( {
-                    "processing": false,
-                    "bFilter": true,
-                    "bInfo": false,
-                    "bLengthChange": false,
-                    "serverSide": true,
-                    "ajax": {
-                        "url": urlGetshow1+"?tanggal="+tanggal2+"&tanggal2="+tanggal,
-                        "type": "GET"
-                    },
-                    "columns": [
-                        { "data": "no" },
-                        { "data": "nama_investor" },
-                        { "data": "nomor_ktp" },
-                        { "data": "npwp" },
-                        { "data": "kewarganegaraan" },
-                        { "render": function (data, type, row, meta) {
-                            var show = $('<a><button>')
-                                        .attr('class', "btn bg-blue-grey waves-effect edit-menu")
-                                        .attr('onclick', "showProcess('"+row.id+"')")
-                                        .text('Show')
-                                        .wrap('<div></div>')
-                                        .parent()
-                                    .html();
-                            return show ;
-                                }
-                        },
-                    ],
-            });
-            $(".test").trigger("click");
-            $( ".first" ).addClass( "hidden" );
-            $( ".second" ).removeClass( "hidden" );	
+       if(Date.parse(tanggal) > Date.parse(tanggal2)){
+            swal("Gagal",'Tanggal pertama lebih besar dari tanggal kedua','error')
         }else {
-            swal("Get fails!","periksa kembali isi form anda !!!", "error")
+            if ((tanggal != "") & (tanggal2 != "") & (tanggal != tanggal2)) {
+                $('.basic').html('<h2>'+tanggal+'</h2>');
+                $('.basic1').html('<h2>'+tanggal2+'</h2>');
+                var listTable1 = $('.listTable1').DataTable( {
+                        "processing": false,
+                        "bFilter": true,
+                        "bInfo": false,
+                        "bLengthChange": false,
+                        "serverSide": true,
+                        "ajax": {
+                            "url": urlGetshow1+"?tanggal="+tanggal+"&tanggal2="+tanggal2,
+                            "type": "GET"
+                        },
+                        "fnRowCallback": function( nRow, Data, iDisplayIndex, iDisplayIndexFull ) {
+                            if ( Data['status_jumlah'] == "h" )
+                            {
+                                $('td', nRow).css('background-color', '#00FF7F');
+                                $('td', nRow).css('color', 'black');
+                            }
+                            else if ( Data['status_jumlah'] == "k" )
+                            {
+                                $('td', nRow).css('background-color', '#FFD700');
+                                $('td', nRow).css('color', 'black');
+                            }else if ( Data['status_jumlah'] == "b" ) {
+                                $('td', nRow).css('background-color', '#00BFFF');
+                                $('td', nRow).css('color', 'white');
+                            }
+                        },
+                        "columns": [
+                            { "data": "no" },
+                            { "data": "nama_investor" },
+                            { "data": "nomor_sid" },
+                            { "data": "nomor_rekening" },
+                            { "data": "jumlah" },
+                            { "data": "perubahan_jumlah" },
+                            // { "render": function (data, type, row, meta) {
+                            //     var show = $('<a><button>')
+                            //                 .attr('class', "btn bg-blue-grey waves-effect edit-menu")
+                            //                 .attr('onclick', "showProcess('"+row.id+"')")
+                            //                 .text('Show')
+                            //                 .wrap('<div></div>')
+                            //                 .parent()
+                            //             .html();
+                            //     return show ;
+                            //         }
+                            // },
+                        ],
+                });
+                var listTable2 = $('.listTable2').DataTable( {
+                        "processing": false,
+                        "bFilter": true,
+                        "bInfo": false,
+                        "bLengthChange": false,
+                        "serverSide": true,
+                        "ajax": {
+                            "url": urlGetshow1+"?tanggal="+tanggal2+"&tanggal2="+tanggal,
+                            "type": "GET"
+                        },
+                        "fnRowCallback": function( nRow, Data, iDisplayIndex, iDisplayIndexFull ) {
+                            if ( Data['status_jumlah'] == "h" )
+                            {
+                                $('td', nRow).css('background-color', '#00FF7F');
+                                $('td', nRow).css('color', 'black');
+                            }
+                            else if ( Data['status_jumlah'] == "k" )
+                            {
+                                $('td', nRow).css('background-color', '#FFD700');
+                                $('td', nRow).css('color', 'black');
+                            }else if ( Data['status_jumlah'] == "b" ) {
+                                $('td', nRow).css('background-color', '#00BFFF');
+                                $('td', nRow).css('color', 'white');
+                            }
+                        },
+                        "columns": [
+                            { "data": "no" },
+                            { "data": "nama_investor" },
+                            { "data": "nomor_sid" },
+                            { "data": "nomor_rekening" },
+                            { "data": "jumlah" },
+                            { "data": "perubahan_jumlah" },
+                            // { "render": function (data, type, row, meta) {
+                            //     var show = $('<a><button>')
+                            //                 .attr('class', "btn bg-blue-grey waves-effect edit-menu")
+                            //                 .attr('onclick', "showProcess('"+row.id+"')")
+                            //                 .text('Show')
+                            //                 .wrap('<div></div>')
+                            //                 .parent()
+                            //             .html();
+                            //     return show ;
+                            //         }
+                            // },
+                        ],
+                });
+                $(".test").trigger("click");
+                $( ".first" ).addClass( "hidden" );
+                $( ".second" ).removeClass( "hidden" );	
+            }else {
+                swal("Get fails!","periksa kembali isi form anda !!!", "error")
+            }
         }
         return false;
     });

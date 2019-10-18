@@ -161,7 +161,10 @@ class investorController extends Controller
         $start=$_REQUEST['start'];
         $search=$_REQUEST['search']["value"];
         $queryCount =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
-        
+          $no = array();
+        foreach ($queryCount as $key => $row) {
+            $no[] = $row->no;
+        }
         // ======= count ===== //
         $total =count($queryCount);
         // print_r();die;
@@ -176,11 +179,30 @@ class investorController extends Controller
             $json['no'] = $row->no;
             $json['id'] = $row->id;
             $json['nama_investor'] = $row->nama_investor;
-            $json['nomor_ktp'] = $row->nomor_ktp;
-            $json['npwp'] = $row->npwp;
-            $json['kewarganegaraan'] = $row->kewarganegaraan;
+            $json['nomor_sid'] = $row->nomor_sid;
+            $json['nomor_rekening'] = $row->nomor_rekening;
+            $json['jumlah'] = $row->jumlah;
+            $json['perubahan_jumlah'] = "-";
+            $json['status_jumlah'] ='b';
             $list[] = $json;
+           
         }
+       
+        $query2 =DF::getIDsExisting(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),$no);
+        foreach ($query2 as $key => $row) {
+            $json['no'] = $row->no;
+            $json['id'] = $row->id;
+            $json['nama_investor'] = $row->nama_investor;
+            $json['nomor_sid'] = $row->nomor_sid;
+            $json['nomor_rekening'] = $row->nomor_rekening;
+            $json['jumlah'] = $row->jumlah;
+            $json['perubahan_jumlah'] = $row->hasil_kurang;
+            $json['status_jumlah'] = $row->status_jumlah;
+            $list[] = $json;
+            
+        }
+        
+       
         $output['data']  = $list;
         echo json_encode($output);
     }    
