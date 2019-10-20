@@ -65,12 +65,12 @@ class DetailsFile extends Model {
         $listData = \DB::select($query);
       	 return $listData;
     }
-    public static function getCompare($firstDate,$endDate,$status){
+    public static function getCompare($firstDate,$endDate,$status,$minusCount=0){
         $search = Input::get('search');
         $where = "";
         // limit 10 OFFSET 1
         $start = Input::get('start');
-        $length = Input::get('length');
+        $length = Input::get('length') - $minusCount;
         $limit ="";
         if ($status) {
             if (isset($start) AND isset($length)) {
@@ -102,9 +102,18 @@ class DetailsFile extends Model {
         }
      return $result;
     }
-    public static function getIDsExisting($firstDate,$endDate,$ids){
+    public static function getIDsExisting($firstDate,$endDate,$ids,$status){
         $search = Input::get('search');
         $where = "";
+          // limit 10 OFFSET 1
+          $start = Input::get('start');
+          $length = Input::get('length');
+          $limit ="";
+          if ($status) {
+              if (isset($start) AND isset($length)) {
+                  $limit  = "LIMIT ".$length." OFFSET ".$start;
+              }
+          }
         if (!empty($search['value'])){
             $value = $search['value'];
             $where .= " WHERE data2.nama_investor  like '%".$value."%'";
@@ -115,10 +124,12 @@ class DetailsFile extends Model {
         }
         $query = "SELECT d1.jumlah as jumlah_lawan,data2.jumlah, data2.id,
         CASE
-            WHEN d1.jumlah > data2.jumlah THEN 'h'
-            ELSE 'k'
+						WHEN data2.jumlah = 0 THEN 'm'
+            WHEN d1.jumlah > data2.jumlah THEN 'k'	
+            WHEN  d1.jumlah < data2.jumlah THEN 'h'	
+						else 'g'
         END AS status_jumlah,
-        (d1.jumlah - data2.jumlah) as hasil_kurang,
+        (data2.jumlah -d1.jumlah) as hasil_kurang,
         data2.no,
         data2.nama_investor,
         data2.nomor_rekening,
@@ -126,8 +137,8 @@ class DetailsFile extends Model {
     FROM master_file m1
         LEFT JOIN details_file d1 ON d1.id_master = m1.id and m1.date = '".$endDate."'
         INNER JOIN  (SELECT d2.*,m2.date as datem2,m2.id as idm2 FROM master_file m2
-Left JOIN details_file d2 on d2.id_master = m2.id and m2.date = '".$firstDate."' ".$whereIn.") data2 ON data2.no = d1.no AND data2.jumlah != d1.jumlah
-    ".$where."
+Left JOIN details_file d2 on d2.id_master = m2.id and m2.date = '".$firstDate."' ".$whereIn.") data2 ON data2.no = d1.no
+    ".$where." ".$limit."
 ";
     $listData = \DB::select($query);
     return $listData;

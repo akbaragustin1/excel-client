@@ -165,30 +165,17 @@ class investorController extends Controller
         foreach ($queryCount as $key => $row) {
             $no[] = $row->no;
         }
-        // ======= count ===== //
-        $total =count($queryCount);
-        // print_r();die;
-        // ======= count ===== //
+        $query2Count =DF::getIDsExisting(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),$no,false);
+         // ======= count ===== //
+         $total =count($queryCount) + count($query2Count);
+          // print_r();die;
+          // ======= count ===== //
         $output=array();
         $output['draw']=$draw;
          $output['recordsTotal']=$output['recordsFiltered']=$total;
         $output['data']=array();
         $list = [];
-        $query =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),true);
-        foreach ($query as $key => $row) {
-            $json['no'] = $row->no;
-            $json['id'] = $row->id;
-            $json['nama_investor'] = $row->nama_investor;
-            $json['nomor_sid'] = $row->nomor_sid;
-            $json['nomor_rekening'] = $row->nomor_rekening;
-            $json['jumlah'] = $row->jumlah;
-            $json['perubahan_jumlah'] = "-";
-            $json['status_jumlah'] ='b';
-            $list[] = $json;
-           
-        }
-       
-        $query2 =DF::getIDsExisting(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),$no);
+        $query2 =DF::getIDsExisting(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),$no,true);
         foreach ($query2 as $key => $row) {
             $json['no'] = $row->no;
             $json['id'] = $row->id;
@@ -198,11 +185,23 @@ class investorController extends Controller
             $json['jumlah'] = $row->jumlah;
             $json['perubahan_jumlah'] = $row->hasil_kurang;
             $json['status_jumlah'] = $row->status_jumlah;
-            $list[] = $json;
-            
+            $json['jumlah_lawan'] = $row->jumlah_lawan;
+            $list[] = $json; 
         }
-        
-       
+        $query =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),true,count($query2));
+        foreach ($query as $key => $row) {
+            $json['no'] = $row->no;
+            $json['id'] = $row->id;
+            $json['nama_investor'] = $row->nama_investor;
+            $json['nomor_sid'] = $row->nomor_sid;
+            $json['nomor_rekening'] = $row->nomor_rekening;
+            $json['jumlah'] = $row->jumlah;
+            $json['perubahan_jumlah'] = "-";
+            $json['status_jumlah'] ='b';
+            $json['jumlah_lawan'] ='-';
+            $list[] = $json;
+           
+        }   
         $output['data']  = $list;
         echo json_encode($output);
     }    
