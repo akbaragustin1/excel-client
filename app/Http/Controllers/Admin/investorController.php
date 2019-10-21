@@ -192,14 +192,10 @@ class investorController extends Controller
     }
     public function generateExcel()
     {   
-        $data =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
+        $data =DF::getExcelData(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
         $data =json_decode(json_encode($data), true);
-        return Excel::create('testing', function($excel) use ($data) {
-            $excel->sheet('Sheet1', function($sheet) use ($data)
-            {
-                $sheet->fromArray($data);
-            });
-        })->export('xlsx');
+        $result['data']= $data;
+        return view('admin/investor/exportExcel',$result);
     }
     public function countByDateForGraph() {
         $data = DF::getCountByMonth();

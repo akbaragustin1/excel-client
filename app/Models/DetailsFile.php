@@ -127,44 +127,50 @@ class DetailsFile extends Model {
         }
      return $result;
     }
-    public static function getIDsExisting($firstDate,$endDate,$ids,$status){
+    public static function getExcelData($firstDate,$endDate,$status){
         $search = Input::get('search');
         $where = "";
-          // limit 10 OFFSET 1
-          $start = Input::get('start');
-          $length = Input::get('length');
-          $limit ="";
-          if ($status) {
-              if (isset($start) AND isset($length)) {
-                  $limit  = "LIMIT ".$length." OFFSET ".$start;
-              }
-          }
+        // limit 10 OFFSET 1
+        $start = Input::get('start');
+        $length = Input::get('length');
+        $limit ="";
+        if ($status) {
+            if (isset($start) AND isset($length)) {
+                $limit  = "LIMIT ".$length." OFFSET ".$start;
+            }
+        }
         if (!empty($search['value'])){
             $value = $search['value'];
-            $where .= " WHERE data2.nama_investor  like '%".$value."%'";
-        }  
-        $whereIn = "";
-        if (count($ids) > 0) {
-            $whereIn .= "WHERE d2.no NOT IN (".implode(',',$ids).")";
+            $where .= " AND details_file.nama_investor  like '%".$value."%'";
         }
-        $query = "SELECT d1.jumlah as jumlah_lawan,data2.jumlah, data2.id,
-        CASE
-						WHEN data2.jumlah = 0 THEN 'm'
-            WHEN d1.jumlah > data2.jumlah THEN 'k'	
-            WHEN  d1.jumlah < data2.jumlah THEN 'h'	
-						else 'g'
-        END AS status_jumlah,
-        (data2.jumlah -d1.jumlah) as hasil_kurang,
-        data2.no,
-        data2.nama_investor,
-        data2.nomor_rekening,
-        data2.nomor_sid
-    FROM master_file m1
-        LEFT JOIN details_file d1 ON d1.id_master = m1.id and m1.date = '".$endDate."'
-        INNER JOIN  (SELECT d2.*,m2.date as datem2,m2.id as idm2 FROM master_file m2
-Left JOIN details_file d2 on d2.id_master = m2.id and m2.date = '".$firstDate."' ".$whereIn.") data2 ON data2.no = d1.no
-    ".$where." ".$limit."
-";
+        if (!empty($search['status_jumlah'])) {
+        $where .= "  AND ( CASE
+                        WHEN a.jumlah = 0 THEN 'm'
+            WHEN b.jumlah > a.jumlah THEN 'k'	
+            WHEN  b.jumlah < a.jumlah THEN 'h'
+                        WHEN b.jumlah = a.jumlah THEN 'g'
+                        else 'b'
+                        END ) = 'm' ";
+        }  
+        $query = " SELECT a.*,
+       
+    CASE
+                    WHEN a.jumlah = 0 THEN 'm'
+        WHEN b.jumlah > a.jumlah THEN 'k'	
+        WHEN  b.jumlah < a.jumlah THEN 'h'
+                    WHEN b.jumlah = a.jumlah THEN 'g'
+                    else 'b'		
+    END AS status_jumlah,
+    (a.jumlah - b.jumlah) as hasil_kurang,
+    a.no,
+    a.nama_investor,
+    a.nomor_rekening,
+    a.nomor_sid
+     FROM details_file a
+        LEFT JOIN (SELECT * FROM details_file d2 WHERE d2.id_master IN (SELECT id FROM master_file WHERE date = '".$endDate."')) b ON b.no = a.no 
+    WHERE a.id_master IN (SELECT id FROM master_file WHERE date = '".$firstDate."')
+                    ".$where." ".$limit."
+                    ";
     $listData = \DB::select($query);
     return $listData;
     }
