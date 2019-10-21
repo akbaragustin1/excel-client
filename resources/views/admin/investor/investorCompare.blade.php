@@ -154,11 +154,6 @@
                         "bInfo": false,
                         "bLengthChange": true,
                         "serverSide": true,
-                        "pageLength" : 10,
-                        "dom": 'Bfrtip',
-                        "buttons": [
-                        'excel'
-                        ],
                         "ajax": {
                             "url": urlGetshow1+"?tanggal="+tanggal+"&tanggal2="+tanggal2,
                             "type": "GET"

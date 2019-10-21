@@ -161,13 +161,8 @@ class investorController extends Controller
         $start=$_REQUEST['start'];
         $search=$_REQUEST['search']["value"];
         $queryCount =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
-          $no = array();
-        foreach ($queryCount as $key => $row) {
-            $no[] = $row->no;
-        }
-        $query2Count =DF::getIDsExisting(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),$no,false);
          // ======= count ===== //
-         $total =count($queryCount) + count($query2Count);
+         $total =count($queryCount);
           // print_r();die;
           // ======= count ===== //
         $output=array();
@@ -175,8 +170,9 @@ class investorController extends Controller
          $output['recordsTotal']=$output['recordsFiltered']=$total;
         $output['data']=array();
         $list = [];
-        $query2 =DF::getIDsExisting(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),$no,true);
-        foreach ($query2 as $key => $row) {
+      
+        $query =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),true);
+        foreach ($query as $key => $row) {
             $json['no'] = $row->no;
             $json['id'] = $row->id;
             $json['nama_investor'] = $row->nama_investor;
@@ -187,20 +183,6 @@ class investorController extends Controller
             $json['status_jumlah'] = $row->status_jumlah;
             $json['jumlah_lawan'] = $row->jumlah_lawan;
             $list[] = $json; 
-        }
-        $query =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),true,count($query2));
-        foreach ($query as $key => $row) {
-            $json['no'] = $row->no;
-            $json['id'] = $row->id;
-            $json['nama_investor'] = $row->nama_investor;
-            $json['nomor_sid'] = $row->nomor_sid;
-            $json['nomor_rekening'] = $row->nomor_rekening;
-            $json['jumlah'] = $row->jumlah;
-            $json['perubahan_jumlah'] = "-";
-            $json['status_jumlah'] ='b';
-            $json['jumlah_lawan'] ='-';
-            $list[] = $json;
-           
         }   
         $output['data']  = $list;
         echo json_encode($output);
@@ -211,19 +193,13 @@ class investorController extends Controller
     public function generateExcel()
     {   
         $data =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
-        $data2 =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal2'))),date("Y-m-d",strtotime(Input::get('tanggal'))),false);
         $data =json_decode(json_encode($data), true);
-        $data2 =json_decode(json_encode($data2), true);
-        return Excel::create('testing', function($excel) use ($data,$data2) {
+        return Excel::create('testing', function($excel) use ($data) {
             $excel->sheet('Sheet1', function($sheet) use ($data)
             {
                 $sheet->fromArray($data);
             });
-            $excel->sheet('Sheet2', function($sheet) use ($data2)
-            {
-                $sheet->fromArray($data2);
-            });
-        })->export('xls');
+        })->export('xlsx');
     }
     public function countByDateForGraph() {
         $data = DF::getCountByMonth();
