@@ -183,7 +183,9 @@ class investorController extends Controller
             $json['status_jumlah'] = $row->status_jumlah;
             $json['jumlah_lawan'] = $row->jumlah_lawan;
             $list[] = $json; 
-        }   
+        }  
+        $first_date =date('d F Y',strtotime(Input::get('tanggal')));
+        $output['first_date'] = $first_date; 
         $output['data']  = $list;
         echo json_encode($output);
     }    
@@ -203,5 +205,12 @@ class investorController extends Controller
         $data = DF::getCountByMonth();
         $output['data'] = $data;
         echo json_encode($output);
+    }
+    public function showindexAjax($id){
+        $edit = DF::where('id','=',$id)->get();
+        $data = json_decode(json_encode($edit), true);
+        $list['data'] =$data[0];
+        
+       return view('admin/investor/show',$list);
     }
 }

@@ -128,6 +128,7 @@
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
   var urlGetshow1 = "{{url('/admin/investor-compore-index-ajax')}}";
+  var urlAjaxShow = "{{url('/admin/investor-show-index-ajax')}}";
   var urlSaveInvestor ="{{url(route('investor.create'))}}";
   var urlGenerateExcel = "{{url('/admin/investor-generate-excel')}}";
     
@@ -147,7 +148,6 @@
        var tanggal2 = $(".tanggal2").val();
             if ((tanggal != "") & (tanggal2 != "") & (tanggal != tanggal2)) {
                 $('.basic').html('<h2>'+tanggal+'</h2>');
-                $('.basic1').html('<h2>'+tanggal2+'</h2>');
                 var listTable1 = $('.listTable1').DataTable( {
                         "processing": false,
                         "bFilter": true,
@@ -210,6 +210,10 @@
 $('#tanggal').datetimepicker();
 //this date picker
 $('#tanggal2').datetimepicker();
+  //show Detail data by id
+  function showProcess(id){
+        window.open(urlAjaxShow+"/"+id,"width=800px, height=500px");
+    }
 </script>
 @endsection
 @stop

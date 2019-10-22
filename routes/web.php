@@ -42,6 +42,7 @@ Route::group(['middleware' => 'seller_auth'], function() {
 
         Route::get('/investor-compare-index', ['uses' =>'investorController@compareIndex','as'=>'investor.compare.index']);
         Route::get('/investor-compore-index-ajax', ['uses' =>'investorController@compareindexAjax','as'=>'investor.compare.indexAjax']);
+        Route::get('/investor-show-index-ajax/{id}', ['uses' =>'investorController@showindexAjax','as'=>'investor.show.indexAjax']);
         Route::get('/investor-generate-excel', ['uses' =>'investorController@generateExcel','as'=>'investor.generate.excel']);
         Route::get('/investor-graph', ['uses' =>'investorController@countByDateForGraph','as'=>'investor.count.graph']);
     });

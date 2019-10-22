@@ -79,7 +79,7 @@ class DetailsFile extends Model {
         }
         if (!empty($search['value'])){
             $value = $search['value'];
-            $where .= " AND details_file.nama_investor  like '%".$value."%'";
+            $where .= " AND a.nama_investor  like '%".$value."%'";
         }
         if (!empty($search['status_jumlah'])) {
         $where .= "  AND ( CASE
@@ -141,7 +141,7 @@ class DetailsFile extends Model {
         }
         if (!empty($search['value'])){
             $value = $search['value'];
-            $where .= " AND details_file.nama_investor  like '%".$value."%'";
+            $where .= " AND a.nama_investor  like '%".$value."%'";
         }
         if (!empty($search['status_jumlah'])) {
         $where .= "  AND ( CASE
