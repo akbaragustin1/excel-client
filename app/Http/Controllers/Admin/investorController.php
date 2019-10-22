@@ -193,8 +193,10 @@ class investorController extends Controller
     public function generateExcel()
     {   
         $data =DF::getExcelData(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
+        $first_date =date('d F Y',strtotime(Input::get('tanggal')));
         $data =json_decode(json_encode($data), true);
         $result['data']= $data;
+        $result['first_date'] = $first_date;
         return view('admin/investor/exportExcel',$result);
     }
     public function countByDateForGraph() {

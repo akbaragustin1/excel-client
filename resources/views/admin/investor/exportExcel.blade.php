@@ -1,4 +1,7 @@
-
+<?php
+header("Content-type: application/vnd-ms-excel");
+header("Content-Disposition: attachment; filename=".$first_date.".xlsx");
+?>
 <style>
 table {
   border-collapse: collapse;
@@ -34,9 +37,18 @@ table, th, td {
             <th>Status Balance</th>
             <th>Percentage (%)</th>
         </tr>
-        <tr>
         @foreach($data as $investor)
-            <tr style="background-color:blue;color:white;">
+            @if($investor['status_jumlah'] == 'b')
+            <tr style="background-color:#00BFFF;color:black;">
+            @elseif($investor['status_jumlah'] == 'k')
+            <tr style="background-color:#FFD700;color:black;">
+            @elseif($investor['status_jumlah'] == 'h')
+            <tr style="background-color:#00FF7F;color:black;">
+            @elseif($investor['status_jumlah'] == 'm')
+            <tr style="background-color:#F95C5C;color:black;">
+            @else
+            <tr style="color:black;">
+            @endif
                 <td>{{$investor['no']}}</td>
                 <td>{{$investor['tanggal']}}</td>
                 <td>{{$investor['nama_investor']}}</td>
@@ -61,39 +73,6 @@ table, th, td {
                 <td>{{$investor['percentage']}}</td>
             </tr>
         @endforeach
-        </tr>
-    </table>
-    <button onclick="exportTableToExcel('tblData')">Export Table Data To Excel File</button>
-<script>
-function exportTableToExcel(tableID, filename = ''){
-    var downloadLink;
-    var dataType = 'application/vnd.ms-excel';
-    var tableSelect = document.getElementById(tableID);
-    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
-    
-    // Specify file name
-    filename = filename?filename+'.xlsx':'excel_data.xlsx';
-    
-    // Create download link element
-    downloadLink = document.createElement("a");
-    
-    document.body.appendChild(downloadLink);
-    
-    if(navigator.msSaveOrOpenBlob){
-        var blob = new Blob(['\ufeff', tableHTML], {
-            type: dataType
-        });
-        navigator.msSaveOrOpenBlob( blob, filename);
-    }else{
-        // Create a link to the file
-        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-    
-        // Setting the file name
-        downloadLink.download = filename;
         
-        //triggering the function
-        downloadLink.click();
-    }
-}
-</script>
+    </table>
 </html>
