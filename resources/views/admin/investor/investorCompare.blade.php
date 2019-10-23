@@ -96,12 +96,10 @@
                     <thead>
                         <tr>
                         <th>No</th>
-                        <th>Nama Investor</th>
-                        <th>Nomor SID</th>
-                        <th>No Rek</th>
-                        <th>Jumlah Ke 1</th>
-                        <th>Perubahan Jumlah</th>
-                        <th>Jumlah Ke 2</th>
+                        <th>Nama</th>
+                        <th>Nama Pemegang Sekuritas</th>
+                        <th>Status Rek</th>
+                        <th>Jumlah</th>
                         <th>Action</th>
                         </tr>
                     </thead>
@@ -154,6 +152,7 @@
                         "bInfo": false,
                         "bLengthChange": true,
                         "serverSide": true,
+                        "lengthMenu": [ 10, 50, 75, 100,200,300,400,500],
                         "ajax": {
                             "url": urlGetshow1+"?tanggal="+tanggal+"&tanggal2="+tanggal2,
                             "type": "GET"
@@ -179,11 +178,9 @@
                         "columns": [
                             { "data": "no" },
                             { "data": "nama_investor" },
-                            { "data": "nomor_sid" },
-                            { "data": "nomor_rekening" },
+                            { "data": "nama_pemegang_rekening" },
+                            { "data": "status_rekening" },
                             { "data": "jumlah" },
-                            { "data": "perubahan_jumlah" },
-                            { "data": "jumlah_lawan" },
                             { "render": function (data, type, row, meta) {
                                 var show = $('<a><button>')
                                             .attr('class', "btn bg-blue-grey waves-effect edit-menu")

@@ -105,7 +105,9 @@ class DetailsFile extends Model {
     a.no,
     a.nama_investor,
     a.nomor_rekening,
-    a.nomor_sid
+    a.nomor_sid,
+    a.nama_pemegang_rekening,
+    a.status_rekening
      FROM details_file a
         LEFT JOIN (SELECT * FROM details_file d2 WHERE d2.id_master IN (SELECT id FROM master_file WHERE date = '".$endDate."')) b ON b.no = a.no 
     WHERE a.id_master IN (SELECT id FROM master_file WHERE date = '".$firstDate."')

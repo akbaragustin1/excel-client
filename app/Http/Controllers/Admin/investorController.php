@@ -91,6 +91,7 @@ class investorController extends Controller
                     $detailFile->tingkat_pajak_corp = $sheet['tingkat_pajak_corp'];
                     $detailFile->tingkat_pajak_mtn = $sheet['tingkat_pajak_mtn'];
                     $detailFile->kode_pemegang_rekening = $sheet['kode_pemegang_rekening'];
+                    $detailFile->nama_pemegang_rekening = $sheet['nama_pemegang_rekening'];
                     $detailFile->jumlah = floatval($sheet['jumlah']);
                     $detailFile->status_rekening = $sheet['status_rekening'];
                     $detailFile->status_balance = $sheet['status_balance'];
@@ -182,6 +183,8 @@ class investorController extends Controller
             $json['perubahan_jumlah'] = $row->hasil_kurang;
             $json['status_jumlah'] = $row->status_jumlah;
             $json['jumlah_lawan'] = $row->jumlah_lawan;
+            $json['nama_pemegang_rekening'] = $row->nama_pemegang_rekening;
+            $json['status_rekening'] = $row->status_rekening;
             $list[] = $json; 
         }  
         $first_date =date('d F Y',strtotime(Input::get('tanggal')));
