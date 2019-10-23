@@ -72,6 +72,7 @@ class investorController extends Controller
                 $masterFile->save();
                 $id_master = $masterFile->id;
                 foreach($data->toArray() as $key => $sheet) {
+                  
                     $detailFile = new DF;
                     $detailFile->no = $sheet['no'];
                     $detailFile->passport = $sheet['passport'];
@@ -95,7 +96,7 @@ class investorController extends Controller
                     $detailFile->jumlah = floatval($sheet['jumlah']);
                     $detailFile->status_rekening = $sheet['status_rekening'];
                     $detailFile->status_balance = $sheet['status_balance'];
-                    $detailFile->percentage =floatval($sheet['percentage']);
+                    $detailFile->percentage =$sheet['percentage'];
                     $detailFile->nomor_sid = $sheet['nomor_sid'];
                     $detailFile->tingkat_pajak_equi = $sheet['tingkat_pajak_equi'];
                     $detailFile->save();
