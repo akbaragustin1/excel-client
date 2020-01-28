@@ -67,6 +67,7 @@ class DetailsFile extends Model {
     }
     public static function getCompare($firstDate,$endDate,$status){
         $search = Input::get('search');
+        $jumlah_status = Input::get('searchByColor');
         $where = "";
         // limit 10 OFFSET 1
         $start = Input::get('start');
@@ -81,14 +82,14 @@ class DetailsFile extends Model {
             $value = $search['value'];
             $where .= " AND a.nama_investor  like '%".$value."%'";
         }
-        if (!empty($search['status_jumlah'])) {
+        if (!empty($jumlah_status)) {
         $where .= "  AND ( CASE
                         WHEN a.jumlah = 0 THEN 'm'
             WHEN b.jumlah > a.jumlah THEN 'k'	
             WHEN  b.jumlah < a.jumlah THEN 'h'
                         WHEN b.jumlah = a.jumlah THEN 'g'
                         else 'b'
-                        END ) = 'm' ";
+                        END ) =  '".$jumlah_status."' ";
         }  
         $query = " SELECT 
         b.jumlah as jumlah_lawan,
@@ -112,6 +113,37 @@ class DetailsFile extends Model {
         LEFT JOIN (SELECT * FROM details_file d2 WHERE d2.id_master IN (SELECT id FROM master_file WHERE date = '".$endDate."')) b ON b.no = a.no 
     WHERE a.id_master IN (SELECT id FROM master_file WHERE date = '".$firstDate."')
                     ".$where." ".$limit."
+                    ";
+        $listData = \DB::select($query);
+    
+        return $listData;
+    }
+    public static function countCompare($firstDate,$endDate){
+        $search = Input::get('search');
+        $jumlah_status = Input::get('searchByColor');
+        $where = "";
+        // limit 10 OFFSET 1
+        $start = Input::get('start');
+        $length = Input::get('length');
+        $limit ="";
+        if (!empty($search['value'])){
+            $value = $search['value'];
+            $where .= " AND a.nama_investor  like '%".$value."%'";
+        }
+        if (!empty($jumlah_status)) {
+        $where .= "  AND ( CASE
+                        WHEN a.jumlah = 0 THEN 'm'
+            WHEN b.jumlah > a.jumlah THEN 'k'	
+            WHEN  b.jumlah < a.jumlah THEN 'h'
+                        WHEN b.jumlah = a.jumlah THEN 'g'
+                        else 'b'
+                        END ) =  '".$jumlah_status."' ";
+        }  
+        $query = " SELECT COUNT(*) as total
+     FROM details_file a
+        LEFT JOIN (SELECT * FROM details_file d2 WHERE d2.id_master IN (SELECT id FROM master_file WHERE date = '".$endDate."')) b ON b.no = a.no 
+    WHERE a.id_master IN (SELECT id FROM master_file WHERE date = '".$firstDate."')
+                    ".$where."
                     ";
         $listData = \DB::select($query);
     

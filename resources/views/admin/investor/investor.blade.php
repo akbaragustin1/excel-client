@@ -14,6 +14,33 @@
     <link href="{{ URL::asset('') }}plugins/vendors/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css" rel="stylesheet">
 
     <link href="{{ URL::asset('') }}plugins/vendors/cropper/dist/cropper.min.css" rel="stylesheet">
+
+    <style>
+    .modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('http://i.stack.imgur.com/FhHRx.gif') 
+                50% 50% 
+                no-repeat;
+      }
+
+      /* When the body has the loading class, we turn
+        the scrollbar off with overflow:hidden */
+      body.loading .modal {
+          overflow: hidden;   
+      }
+
+      /* Anytime the body has the loading class, our
+        modal element will be visible */
+      body.loading .modal {
+          display: block;
+      }</style>
 @endsection
   <!-- page content -->
   <div class="right_col" role="main">
@@ -122,6 +149,8 @@
       </div>
 
   </div>
+
+  <div class="modal"><!-- Place at bottom of page --></div>
   <!-- /page content -->    
 
       <!--end-main-container-part-->
@@ -191,6 +220,8 @@ $('#tanggal').datetimepicker();
             $(element).parents('.control-group').addClass('success');
           },
       submitHandler: function(form) {
+        $body = $("body");
+        $body.addClass("loading");
           //thi is get data form
           var formData = new FormData();
           formData.append('file', $('#file')[0].files[0]);
@@ -208,6 +239,7 @@ $('#tanggal').datetimepicker();
               processData: false,  // tell jQuery not to process the data
               contentType: false,  // tell jQuery not to set contentType
               success: function(retval) {
+                $body.removeClass("loading");
                       // if sent save success then swall alert and reload page
                       if (retval.status == true){
                           $('#reset').trigger('click');

@@ -162,14 +162,12 @@ class investorController extends Controller
         $length=$_REQUEST['length'];
         $start=$_REQUEST['start'];
         $search=$_REQUEST['search']["value"];
-        $queryCount =DF::getCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))),false);
-         // ======= count ===== //
-         $total =count($queryCount);
-          // print_r();die;
-          // ======= count ===== //
+       
+        $queryCount =DF::countCompare(date("Y-m-d",strtotime(Input::get('tanggal'))),date("Y-m-d",strtotime(Input::get('tanggal2'))));
+  
         $output=array();
         $output['draw']=$draw;
-         $output['recordsTotal']=$output['recordsFiltered']=$total;
+         $output['recordsTotal']=$output['recordsFiltered']=$queryCount[0]->total;
         $output['data']=array();
         $list = [];
       
@@ -216,5 +214,10 @@ class investorController extends Controller
         $list['data'] =$data[0];
         
        return view('admin/investor/show',$list);
+    }
+    public function getMasterFile() {
+        $data = MF::all()->toArray();
+        $list['data'] = $data;
+        return view('admin/investor/masterFile',$list);
     }
 }

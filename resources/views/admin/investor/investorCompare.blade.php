@@ -14,6 +14,27 @@
     <link href="{{ URL::asset('') }}plugins/vendors/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css" rel="stylesheet">
 
     <link href="{{ URL::asset('') }}plugins/vendors/cropper/dist/cropper.min.css" rel="stylesheet">
+<style>
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+ 
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  border-top-color: #333;
+  animation: spinner .6s linear infinite;
+}
+</style>
 @endsection
   <!-- page content -->
     <div class="right_col" role="main">
@@ -91,7 +112,14 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-
+                <select id='searchBycolor'>
+                                <option value=''>-- Filter Warna--</option>
+                                <option value='h' class="boldoption">Hijau </option>
+                                <option value='b'>Biru</option>
+                                <option value='m'>Merah</option>
+                                <option value='g'>Abu abu</option>
+                                <option value='K'>Kuning</option>
+                        </select>
                     <table class="table listTable1">
                     <thead>
                         <tr>
@@ -129,7 +157,6 @@
   var urlAjaxShow = "{{url('/admin/investor-show-index-ajax')}}";
   var urlSaveInvestor ="{{url(route('investor.create'))}}";
   var urlGenerateExcel = "{{url('/admin/investor-generate-excel')}}";
-    
   $('.refresh').on('click',function () {
     location.reload();
     });
@@ -141,21 +168,35 @@
         }
     });
     // var table = $('#users').DataTable();
-    $('.submit').on('click',function () {
+   var testing =  $('.submit').on('click',function () {
        var tanggal = $(".tanggal").val();
        var tanggal2 = $(".tanggal2").val();
+       $('#searchBycolor').change(function(){
+        listTable1.draw();
+        });
             if ((tanggal != "") & (tanggal2 != "") & (tanggal != tanggal2)) {
                 $('.basic').html('<h2>'+tanggal+'</h2>');
                 var listTable1 = $('.listTable1').DataTable( {
-                        "processing": false,
+                        "processing": true,
                         "bFilter": true,
                         "bInfo": false,
                         "bLengthChange": true,
                         "serverSide": true,
-                        "lengthMenu": [ 10, 50, 75, 100,200,300,400,500],
+                        "lengthMenu": [ 50,100,500,1000,5000],
+                        'language': {
+                            'loadingRecords': '&nbsp;',
+                            'processing': '<div class="spinner"></div>'
+                        },       
                         "ajax": {
                             "url": urlGetshow1+"?tanggal="+tanggal+"&tanggal2="+tanggal2,
-                            "type": "GET"
+                            "type": "GET",
+                            'data': function(data){
+                                // Read values
+                                var color = $('#searchBycolor').val();
+
+                                // Append to data
+                                data.searchByColor = color;
+                            }
                         },
                         "fnRowCallback": function( nRow, Data, iDisplayIndex, iDisplayIndexFull ) {
                             if ( Data['status_jumlah'] == "h" )
