@@ -64,7 +64,6 @@ class investorController extends Controller
         $tampung = array();
         $data =Excel::load(Input::file('file'))->get();  
         if ($data->count() > 0){
-            try {
                 $masterFile = new MF;
                 $masterFile->file_name = Input::file('file')->getClientOriginalName();
                 $masterFile->created_at = date('Y-m-d H:i:s');
@@ -72,7 +71,7 @@ class investorController extends Controller
                 $masterFile->save();
                 $id_master = $masterFile->id;
                 foreach($data->toArray() as $key => $sheet) {
-                  
+                  if (!empty($sheet['no'])){
                     $detailFile = new DF;
                     $detailFile->no = $sheet['no'];
                     $detailFile->passport = $sheet['passport'];
@@ -100,19 +99,13 @@ class investorController extends Controller
                     $detailFile->nomor_sid = $sheet['nomor_sid'];
                     $detailFile->tingkat_pajak_equi = $sheet['tingkat_pajak_equi'];
                     $detailFile->save();
+                  }   
                 }
-                    DB::commit();
                     $validator = 'transaksi anda berhasil';
                     $return['status'] = true;
                     $return['messages'] =$validator;
                     $return['data'] =[];
                     return $return;
-             }catch (\Exception $e) {
-                DB::rollBack();
-                $json['status'] = false;
-                $json['messages'] = 'Failed';
-                $json['data'] = [];
-             }
         }
     }
     private function uploadfile($fn)
