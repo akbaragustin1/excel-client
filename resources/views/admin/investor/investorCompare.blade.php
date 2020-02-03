@@ -34,6 +34,31 @@
   border-top-color: #333;
   animation: spinner .6s linear infinite;
 }
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: white !important;
+    border: 1px solid #2980B9!important;
+    background-color: #2980B9!important;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2980B9), color-stop(100%, #2980B9))!important;
+    background: -webkit-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: -moz-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: -ms-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: -o-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: linear-gradient(to bottom, #2980B9 0%, #2980B9 100%)!important;
+}
+
+.current {
+    color: white !important;
+    border: 1px solid #2980B9!important;
+    background-color: #2980B9!important;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2980B9), color-stop(100%, #2980B9))!important;
+    background: -webkit-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: -moz-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: -ms-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: -o-linear-gradient(top, #2980B9 0%, #2980B9 100%)!important;
+    background: linear-gradient(to bottom, #2980B9 0%, #2980B9 100%)!important;
+}
+
+
 </style>
 @endsection
   <!-- page content -->
@@ -137,7 +162,18 @@
                 </div>
             </div>
         </div>
+        <!-- Extra large modal -->
+<button type="button" class="btn btn-primary triggerCLick" data-toggle="modal" data-target=".bd-example-modal-xl" hidden>Extra large modal</button>
+
+<div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content testingModal">
+    
     </div>
+  </div>
+</div>
+    </div>
+
 
   <!-- /page content -->    
 
@@ -244,13 +280,22 @@
         
         return false;
     });
+ $(".modal").on('hide.bs.modal', function(){
+    $( ".removeRow" ).remove();
+  });
 //this date picker
 $('#tanggal').datetimepicker();
 //this date picker
 $('#tanggal2').datetimepicker();
   //show Detail data by id
   function showProcess(id){
-        window.open(urlAjaxShow+"/"+id,"width=800px, height=500px");
+        $.ajax({
+        url: urlAjaxShow+"/"+id,
+        context: document.body
+        }).done(function(data) {
+           $('.testingModal').append(data)
+           $( ".triggerCLick" ).trigger( "click" );
+        });
     }
 </script>
 @endsection
