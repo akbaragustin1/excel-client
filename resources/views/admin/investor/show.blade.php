@@ -14,7 +14,7 @@
                 <?php 
                     foreach($data as $key => $value) {   
                     $replace = str_replace('_', ' ', $key);
-                    if ($replace != 'id' && $replace != "created at" && $replace != "id master"){
+                    if ($replace != 'id' && $replace != "created at" && $replace != "id master" && $replace != "tanggal" && $replace != "nomor rekening" && $replace != "nomor ktp" && $replace != "npwp" && $replace != "passport" && $replace != "kewarganegaraan" && $replace != "tingkat pajak corp" && $replace != "tingkat pajak mtn" && $replace != "kode pemegang rekening" && $replace != "status rekening" && $replace != "status balance" && $replace != "nomor sid" && $replace != "tingkat pajak equi" ){
                     $replace = ucfirst($replace);
                 ?>
                   <tr>

@@ -151,7 +151,6 @@
                         <th>No</th>
                         <th>Nama</th>
                         <th>Nama Pemegang Sekuritas</th>
-                        <th>Status Rek</th>
                         <th>Jumlah</th>
                         <th>Action</th>
                         </tr>
@@ -256,7 +255,6 @@
                             { "data": "no" },
                             { "data": "nama_investor" },
                             { "data": "nama_pemegang_rekening" },
-                            { "data": "status_rekening" },
                             { "data": "jumlah" },
                             { "render": function (data, type, row, meta) {
                                 var show = $('<a><button>')

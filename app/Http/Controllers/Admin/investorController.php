@@ -70,35 +70,29 @@ class investorController extends Controller
                 $masterFile->date = date('Y-m-d',strtotime(Input::get('tanggal')));
                 $masterFile->save();
                 $id_master = $masterFile->id;
+                $ignoreValue = false;
                 foreach($data->toArray() as $key => $sheet) {
                   if (!empty($sheet['no'])){
-                    $detailFile = new DF;
-                    $detailFile->no = $sheet['no'];
-                    $detailFile->passport = $sheet['passport'];
-                    $detailFile->tanggal = $sheet['tanggal'];
-                    $detailFile->nama_investor = $sheet['nama_investor'];
-                    $detailFile->nomor_rekening = $sheet['nomor_rekening'];
-                    $detailFile->id_master = $id_master;
-                    $detailFile->created_at = date('Y-m-d H:i:s');
-                    $detailFile->tanggal = date('Y-m-d',strtotime($sheet['tanggal']));
-                    $detailFile->nomor_ktp = $sheet['nomor_ktp'];
-                    $detailFile->npwp = $sheet['npwp'];
-                    $detailFile->alamat_1 = $sheet['alamat_1'];
-                    $detailFile->alamat_2 = $sheet['alamat_2'];
-                    $detailFile->la = $sheet['la'];
-                    $detailFile->status_investor = $sheet['status_investor'];
-                    $detailFile->kewarganegaraan = $sheet['kewarganegaraan'];
-                    $detailFile->tingkat_pajak_corp = $sheet['tingkat_pajak_corp'];
-                    $detailFile->tingkat_pajak_mtn = $sheet['tingkat_pajak_mtn'];
-                    $detailFile->kode_pemegang_rekening = $sheet['kode_pemegang_rekening'];
-                    $detailFile->nama_pemegang_rekening = $sheet['nama_pemegang_rekening'];
-                    $detailFile->jumlah = floatval($sheet['jumlah']);
-                    $detailFile->status_rekening = $sheet['status_rekening'];
-                    $detailFile->status_balance = $sheet['status_balance'];
-                    $detailFile->percentage =$sheet['percentage'];
-                    $detailFile->nomor_sid = $sheet['nomor_sid'];
-                    $detailFile->tingkat_pajak_equi = $sheet['tingkat_pajak_equi'];
-                    $detailFile->save();
+                      if (!is_string($sheet['no'])) {
+                        if (!$ignoreValue){
+                            $detailFile = new DF;
+                            $detailFile->no = $sheet['no'];
+                            $detailFile->nama_investor = $sheet['nama'];
+                            $detailFile->id_master = $id_master;
+                            $detailFile->created_at = date('Y-m-d H:i:s');
+                            $detailFile->alamat_1 = $sheet['alamat1'];
+                            $detailFile->alamat_2 = $sheet['alamat2'];
+                            $detailFile->la = $sheet['la'];
+                            $detailFile->status_investor = $sheet['status'];
+                            $detailFile->propinsi = $sheet['propinsi'];
+                            $detailFile->nama_pemegang_rekening = $sheet['nama_pemegang_rekening'];
+                            $detailFile->jumlah = floatval($sheet['jumlah_saham']);
+                            $detailFile->percentage =$sheet['percentage'];
+                            $detailFile->save();
+                        }
+                      }else {
+                        $ignoreValue = true;
+                      }
                   }   
                 }
                     $validator = 'transaksi anda berhasil';
@@ -142,9 +136,7 @@ class investorController extends Controller
             $json['no'] = $row->no;
             $json['id'] = $row->id;
             $json['nama_investor'] = $row->nama_investor;
-            $json['nomor_ktp'] = $row->nomor_ktp;
-            $json['npwp'] = $row->npwp;
-            $json['kewarganegaraan'] = $row->kewarganegaraan;
+            $json['status_investor'] = $row->status_investor;
             $list[] = $json;
         }
         $output['data']  = $list;

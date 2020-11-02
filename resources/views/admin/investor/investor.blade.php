@@ -135,10 +135,8 @@
                 <thead>
                   <tr>
                     <th>No</th>
-                    <th>Nama Investor</th>
-                    <th>Nomor KTP</th>
-                    <th>NPWP</th>
-                    <th>Kewarganegaraan</th>
+                    <th>Nama</th>
+                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -180,9 +178,7 @@
          "columns": [
             { "data": "no" },
             { "data": "nama_investor" },
-            { "data": "nomor_ktp" },
-            { "data": "npwp" },
-            { "data": "kewarganegaraan" },
+            { "data": "status_investor" },
             { "render": function (data, type, row, meta) {
                         var show = $('<a><button>')
                                     .attr('class', "btn bg-blue-grey waves-effect edit-menu")
@@ -258,7 +254,16 @@ $('#tanggal').datetimepicker();
           });
       }
   });
-
+  //show Detail data by id
+  function showProcess(id){
+        $.ajax({
+        url: urlAjaxShow+"/"+id,
+        context: document.body
+        }).done(function(data) {
+           $('.testingModal').append(data)
+           $( ".triggerCLick" ).trigger( "click" );
+        });
+    }
   var _validFileExtensions = [".xls", ".xlsx"];    
 function ValidateSingleInput(oInput) {
     if (oInput.type == "file") {
